@@ -1,4 +1,4 @@
- const { ethers } = require("ethers");
+ //const { ethers } = require("ethers");
 
 
 let provider = new ethers.providers.Web3Provider(window.ethereum)
