@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html >
+  <head>
+    <title>Register information at Blockchain</title>
+
+    <link href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' rel='stylesheet' type='text/css'>
+    <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js"></script>
+    <script src="./node_modules/web3/dist/web3.min.js"></script>
+    <script src="./node_modules/ethers/dist/ethers.umd.min.js"> </script>
+    <!-- <script src="./index.js"></script> -->
+    <script  src="./index2.js"></script>    
+    <!-- <script  src="./index3.js"></script>   -->
+  </head>
+
+  <body class="container">
+
+   
+
+    <h1 class="page-header">GIFT CARD</h1>
+    <div class="row">
+      <div>
+        <h3 class="sub-header">1.showAllowedCrypto()</h3>
+        <form class="form-inline" role="form">
+          <div class="form-group">  
+          </div>
+          <a href="#" onclick="showAllowedCryptoJS()" class="btn btn-primary">Ok</a>
+        </form>
+      </div>
+    </div>  
+
+    <div class="row">
+      
+      <div>
+        <h3 class="sub-header">2. addCurrency();</h3>
+        <form class="form-inline" role="form">
+          <div class="form-group">
+            <table>
+              <tr>
+                
+                <td>
+                  <input class="form-control" placeholder="ERC20" id="addCurrencyVal">
+                </td>                          
+              </tr>
+            </table>
+          </div>
+          <a href="#" onclick="addCurrencyJS()" class="btn btn-primary">Ok</a>
+          <p id="addCur"></p>
+        </form>
+      </div>
+    </div> 
+    
+    <div class="row">
+      <div>
+        <h3 class="sub-header">3. seeRoyalty()</h3>
+        <form class="form-inline" role="form">
+          <td>
+            <input class="form-control" placeholder="ERC20" id="seeRoyaltyVal">
+          </td>  
+          <a href="#" onclick="seeRoyaltyJS()" class="btn btn-primary">Ok</a>
+        </form> 
+      </div>
+    </div>  
+
+    <div class="row">
+      <div>
+        <h3 class="sub-header">4. setRoyalty()</h3>
+        <form class="form-inline" role="form">
+          <div class="form-group">
+            <table>
+              <tr>    
+                <td>
+                  <input class="form-control" placeholder="ERC20" id="setRoyaltyERC20">
+                </td>             
+                <td>
+                  <input class="form-control" placeholder="deposit%" id="depos">
+                </td>    
+                <td>
+                  <input class="form-control" placeholder="withdraw%" id="withd">
+                </td>                          
+              </tr>
+            </table>
+          </div>
+          <a href="#" onclick="setRoyaltyJS()" class="btn btn-primary">Ok</a>
+          <p id="setRoyal"></p>
+        </form>
+      </div>
+    </div>  
+
+    <div class="row">
+      <div>
+        <h3 class="sub-header">5. tokenToNft();</h3>
+        <form class="form-inline" role="form">
+          <div class="form-group">
+            <table>
+              <tr>
+                
+                <td>
+                  <input class="form-control" placeholder="IERC721" id="contractTo">
+                </td>      
+                
+                <td>
+                  <input class="form-control" placeholder="Card ID" id="cardIdTo">
+                </td> 
+                
+                <td>
+                  <input class="form-control" placeholder="IERC20" id="erc20To">
+                </td>                                     
+              </tr>
+            </table>
+          </div>
+          <a href="#" onclick="tokenToNftJS()" class="btn btn-primary">Ok</a>
+          <p id="tokNft"></p>
+        </form>
+      </div>
+    </div>    
+
+    <div class="row">
+      <div>
+        <h3 class="sub-header">6. cardInfo()</h3>
+        <form class="form-inline" role="form">
+          <div class="form-group">
+            <table>
+              <tr>               
+                <td>
+                  <input class="form-control" placeholder="ERC721" id="cardfi_contractaddress">
+                </td>            
+                <td>
+                  <input class="form-control" placeholder="NFT_id" id="cardfi_tokenid">
+                </td>                          
+              </tr>
+              
+            </table>
+          </div>
+          <a href="#" onclick="cardInfoJS()" class="btn btn-primary">Ok</a>
+          <p id="cardInfoDisplay"></p>
+        </form>
+        
+      </div>
+    </div>  
+
+
+    <div class="row">
+      <div>
+        <h3 class="sub-header">7. sendTokens();</h3>
+        <form class="form-inline" role="form">
+          <div class="form-group">
+            <table>
+              <tr>
+                
+                <td>
+                  <input class="form-control" placeholder="IERC721" id="ERC721">
+                </td>      
+                
+                <td>
+                  <input class="form-control" placeholder="Card ID" id="idOfCard">
+                </td> 
+                
+                <td>
+                  <input class="form-control" placeholder="amount" id="amountOF">
+                </td>                                 
+              </tr>
+            </table>
+          </div>
+          <a href="#" onclick="sendTokensJS()" class="btn btn-primary">Ok</a>
+          <p id="sendTok"></p>
+        </form>
+      </div>
+    </div>    
+
+
+    <div class="row">
+      <div>
+        <h3 class="sub-header">8. contractBalance()</h3>
+        <form class="form-inline" role="form">
+          <div class="form-group">
+            <table>
+              <tr>               
+                <td>
+                  <input class="form-control" placeholder="ERC20" id="erc20Balance">
+                </td>                          
+              </tr>
+            </table>
+          </div>
+          <a href="#" onclick="contractBalanceJS()" class="btn btn-primary">Ok</a>
+        </form>
+      </div>
+    </div>  
+    
+  
+    
+    <div class="row">
+      <div>
+        <h3 class="sub-header">9. takeSomeMoney()</h3>
+        <form class="form-inline" role="form">
+          <div class="form-group">
+            <table>
+              <tr>
+                <td>
+                  <input class="form-control" placeholder="ERC721" id="contractSome">
+                </td>            
+                <td>
+                  <input class="form-control" placeholder="NFT_id" id="cardIdSome">
+                </td>   
+                <td>
+                  <input class="form-control" placeholder="how much" id="moneySome">
+                </td>                         
+              </tr>
+            </table>
+          </div>
+          <a href="#" onclick="takeSomeMoneyJS()" class="btn btn-primary">Ok</a>
+          <p id="takeMoney"></p>
+        </form>
+      </div>
+    </div> 
+    
+   
+  </body>
+</html>
