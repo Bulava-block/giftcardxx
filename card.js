@@ -1,13 +1,18 @@
-async function cardInfoJS(){
-    var contractADR = document.getElementById("cardfi_contractaddress").value;
-    var tokenid = document.getElementById("cardfi_tokenid").value;
-      // let contractADR = $("#CONTRACT").val();
-      // let  tokenid = $("#TOKEID").val();
-      const cardInfovar = await contract.cardInfo(contractADR, tokenid)
-  
-    let txObject={balance:cardInfovar[0].toString(),
-                  ERC20Added:cardInfovar[2],
-                  ERC20Address:cardInfovar[1]}
-    document.getElementById("cardInfoDisplay").innerHTML =bubble_fn_cardfi_cardInfo(txObject)
-    console.log(txObject)
-  }
+// takeSomeMoney
+async function takeSomeMoneyJS(){
+  var contractSome = document.getElementById("contract_redemption").value;
+  var cardIdSome = document.getElementById("cardId_redemption").value;
+  var amountSome = document.getElementById("money_redemption").value;
+ const {v, r,s, message, signerAddress} = await verify()
+ let tx = await contract.takeSomeMoney(contractSome, cardIdSome, amountSome, v, r, s, message, signerAddress)
+ tx = await tx.wait()
+ console.log(tx)		
+
+   document.getElementById("takeMoney").innerHTML =bubble_fn_cardfi_takeSomeMoney(tx)
+} 
+
+
+// contract.on("Royalty", (depositRoyal, withdrawRoyal)=>{
+//   console.log("Changed deposit Royalty to", depositRoyal.toNumber(), "%")	
+//   console.log("Changed withdraw Royalty to", withdrawRoyal.toNumber(), "%")		
+//   })

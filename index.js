@@ -1,830 +1,211 @@
-// Source code to interact with smart contract
-
-// web3 provider with fallback for old version
-if (window.ethereum) {
-  window.web3 = new Web3(window.ethereum)
-  try {
-      // ask user for permission
-      ethereum.enable()
-      // user approved permission
-  } catch (error) {
-      // user rejected permission
-      console.log('user rejected permission')
+<link href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' rel='stylesheet' type='text/css'>
+<script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js@1.0.0-beta.34/dist/web3.min.js"></script>
+<script
+src="https://cdn.jsdelivr.net/npm/ethers@5.7.1/dist/ethers.umd.min.js"></script>
+<script
+src="https://s3.amazonaws.com/appforest_uf/d100/f1666113486255x885861431080135200/abi.js"></script>
+<script>
+var contractAddress = "0xe1C42c4cAdAFD6BFCb3a20821ca6E24F3155CbD2";
+if (typeof web3 !== 'undefined') {
+    web3 = new Web3(web3.currentProvider);
+    if (web3.version.network == 1) {
+        contractAddress = "0xe1C42c4cAdAFD6BFCb3a20821ca6E24F3155CbD2";
+    } else if (web3.version.network == 80001) {
+        contractAddress = "0xe1C42c4cAdAFD6BFCb3a20821ca6E24F3155CbD2";
+    } else if (web3.version.network == 4) {
+        contractAddress = "0xe1C42c4cAdAFD6BFCb3a20821ca6E24F3155CbD2";
+    } else if (web3.version.network == 42) {
+        contractAddress = "0xe1C42c4cAdAFD6BFCb3a20821ca6E24F3155CbD2";
+    }
+}
+ // const { ethers } = require("ethers");
+let provider = new ethers.providers.Web3Provider(window.ethereum)
+let accounts
+async function init (){
+    await provider.send("eth_requestAccounts", [])
+}
+init ()
+const signer = provider.getSigner()
+console.log(signer)
+console.log("contract",contractAddress)
+  const contract = new ethers.Contract(contractAddress, abi, signer)
+  async function verify(){
+	let signerAddress = await signer.getAddress()
+	console.log(signerAddress)
+	const message = "Make sure the address below is your wallet"
+ const domain = {
+      name: "SetTest",
+      version: "1",
+      chainId: await provider.getNetwork().then(network => network.chainId),
+      verifyingContract: contractAddress
+    }
+    const types =  {
+		set:[
+			{name:"message", type:"string"},
+			{name:"sender", type:"address"},
+		  ]
+    }
+    const value =  {
+        message: message,
+		sender: signerAddress,
+      }
+	
+    let signature = await signer._signTypedData(domain, types, value)
+	
+	let splitSignature = ethers.utils.splitSignature(signature)
+	console.log(splitSignature)
+	const v = splitSignature.v
+	const r = splitSignature.r
+	const s = splitSignature.s
+	 return {v, r,s, message, signerAddress}
   }
-}
-else if (window.web3) {
-  window.web3 = new Web3(window.web3.currentProvider)
-  // no need to ask for permission
-}
-else {
-  window.alert('Connect to Metamask!')
-}
-console.log (window.web3.currentProvider)
-
-// contractAddress and abi are setted after contract deploy
-var contractAddress = '0x2A0F5e3EA4f55E46f996b4BaC46999CbE41498c0';
-var abi =[
-  {
-    "inputs": [],
-    "stateMutability": "nonpayable",
-    "type": "constructor"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "owner",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "approved",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      }
-    ],
-    "name": "Approval",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "owner",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "operator",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "bool",
-        "name": "approved",
-        "type": "bool"
-      }
-    ],
-    "name": "ApprovalForAll",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "previousOwner",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "newOwner",
-        "type": "address"
-      }
-    ],
-    "name": "OwnershipTransferred",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "from",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "to",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      }
-    ],
-    "name": "Transfer",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "cardId",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "delayTime",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "addedFunds",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "totalCurrencies",
-        "type": "uint256"
-      }
-    ],
-    "name": "newAddedCurrency",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "amountTaken",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "remainingFunds",
-        "type": "uint256"
-      }
-    ],
-    "name": "portionTaken",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "pid",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "allTaken",
-        "type": "uint256"
-      }
-    ],
-    "name": "takenAll",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "totalTokenBalance",
-    "type": "event"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "contract IERC20",
-        "name": "_paytoken",
-        "type": "address"
-      }
-    ],
-    "name": "addCurrency",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "allowedCrypto",
-    "outputs": [
-      {
-        "internalType": "contract IERC20",
-        "name": "paytoken",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "to",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      }
-    ],
-    "name": "approve",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "owner",
-        "type": "address"
-      }
-    ],
-    "name": "balanceOf",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "cardId",
-        "type": "uint256"
-      }
-    ],
-    "name": "cardInfo",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "theRest",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "moneyDate",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "coinPid",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "cards",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "coinPid",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "funds",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "moneyDate",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "pid",
-        "type": "uint256"
-      }
-    ],
-    "name": "contractBalance",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "pid",
-        "type": "uint256"
-      }
-    ],
-    "name": "createCard",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "idOfCard",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      }
-    ],
-    "name": "getApproved",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "contract IERC20",
-        "name": "tokenAddress",
-        "type": "address"
-      }
-    ],
-    "name": "getTokenPid",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "_pid",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "owner",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "operator",
-        "type": "address"
-      }
-    ],
-    "name": "isApprovedForAll",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "name",
-    "outputs": [
-      {
-        "internalType": "string",
-        "name": "",
-        "type": "string"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "owner",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      }
-    ],
-    "name": "ownerOf",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "renounceOwnership",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "from",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "to",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      }
-    ],
-    "name": "safeTransferFrom",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "from",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "to",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "bytes",
-        "name": "data",
-        "type": "bytes"
-      }
-    ],
-    "name": "safeTransferFrom",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "cardId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_moneyDate",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "howMuch",
-        "type": "uint256"
-      }
-    ],
-    "name": "sendTokens",
-    "outputs": [],
-    "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "operator",
-        "type": "address"
-      },
-      {
-        "internalType": "bool",
-        "name": "approved",
-        "type": "bool"
-      }
-    ],
-    "name": "setApprovalForAll",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "bytes4",
-        "name": "interfaceId",
-        "type": "bytes4"
-      }
-    ],
-    "name": "supportsInterface",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "symbol",
-    "outputs": [
-      {
-        "internalType": "string",
-        "name": "",
-        "type": "string"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "cardId",
-        "type": "uint256"
-      }
-    ],
-    "name": "takeAll",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "cardId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "takeSomeMoney",
-    "outputs": [],
-    "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "index",
-        "type": "uint256"
-      }
-    ],
-    "name": "tokenByIndex",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "owner",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "index",
-        "type": "uint256"
-      }
-    ],
-    "name": "tokenOfOwnerByIndex",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      }
-    ],
-    "name": "tokenURI",
-    "outputs": [
-      {
-        "internalType": "string",
-        "name": "",
-        "type": "string"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "totalSupply",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "from",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "to",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      }
-    ],
-    "name": "transferFrom",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "newOwner",
-        "type": "address"
-      }
-    ],
-    "name": "transferOwnership",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
+  	//showAllowedCryptoJS
+  async function showAllowedCryptoJS(){
+	let tx=await contract.showAllowedCrypto();
+	
+	console.log(tx)
   }
-];
-//contract instance
-contract = new web3.eth.Contract(abi, contractAddress);
-
-// Accounts
-var account;
-
-web3.eth.getAccounts(function(err, accounts) {
-  if (err != null) {
-    alert("Error retrieving accounts.");
-    return;
+   function bubble_fn_cardfi_sendTokens(transaction){
+        console.log("sendTokens transaction hash is", transaction.transactionHash);
+    return transaction.transactionHash;
+   }
+   function bubble_fn_cardfi_takeSomeMoney(transaction){
+    console.log("takeSomeMoney transaction hash is", transaction.transactionHash);
+  return transaction.transactionHash;
   }
-  if (accounts.length == 0) {
-    alert("No account found! Make sure the Ethereum client is configured properly.");
-    return;
+   function bubble_fn_cardfi_cardInfo(object){
+    return JSON.stringify(object)
+   }
+  // addCurrency
+  async function addCurrencyJS(){
+	currencyVal = $("#addCurrencyVal").val();
+	let tx = await contract.addCurrency(currencyVal)
+	tx = await tx.wait()
+	contract.on("addedCurrency", (_paytoken)=>{
+		 		console.log("Added", _paytoken)			
+	})
+	 console.log(tx)
+   //document.getElementById("addCur").innerHTML =tx.transactionHash
   }
-  account = accounts[0];
-  console.log('Account: ' + account);
-  web3.eth.defaultAccount = account;
-});
-
-//Smart contract functions
-async function addCurencyJS() {
-  numToken = $("#numberToken").val();
-  // contract.methods.addCurency (numToken).send( {from: account}).then( function(tx) { 
-  //   console.log("Transaction: ", tx); 
-  // });
-  const tx = await contract.methods.addCurency (numToken).send( {from: account})
-  console.log(tx)
-  $("#numberToken").val('');
+  // seeRoyalty
+  async function seeRoyaltyJS(){
+	// let tx=await contract.seeRoyalty();
+  let ERC20 = $("#seeRoyaltyVal").val();
+	
+	const tx = await contract.seeRoyalty(ERC20)
+	
+	console.log("deposit Royalty",tx[0].toNumber(),"%")
+	console.log("wihdraw Royalty",tx[1].toNumber(), "%")
+  //document.getElementById("addCur").innerHTML =tx.transactionHash
 }
-
-function registerGetInfo() {
-  contract.methods.getInfo().call().then( function( info ) { 
-    console.log("info: ", info);
-    document.getElementById('lastInfo').innerHTML = info;
-  });    
+// setRoyalty
+async function setRoyaltyJS(){
+  ERC20 = $("#setRoyaltyERC20").val();
+	depos = $("#depos").val();
+	withd = $("#withd").val();
+	let tx = await contract.setRoyalty(ERC20, depos, withd)
+	contract.on("Royalty", (depositRoyal, withdrawRoyal)=>{
+		console.log("Changed deposit Royalty to", depositRoyal.toNumber(), "%")	
+		console.log("Changed withdraw Royalty to", withdrawRoyal.toNumber(), "%")		
+    })
+	console.log("here is the hash",tx.hash)
+  //document.getElementById("setRoyal").innerHTML =tx.hash
 }
-
-// function balanceJS() {
-//   pid = $("#pid").val();
-//   contract.methods.contractBalance (pid).send( {from: account}).then( function(tx) { 
-//     console.log("Transaction: ", tx); 
-//   });
-//   $("#pid").val('');
-// }
-
-function makeCard() {
-  //numToken = $("#numberToken").val();
-  contract.methods.createCard().send( {from: account}).then( function(tx) { 
-    console.log("Transaction: ", tx); 
-  });
-  //$("#numberToken").val('');
+// tokenToNft
+async function tokenToNftJS(){
+	// let contractTo = $("#contractTo").val();
+    var contractTo = document.getElementById("contractTo").value;
+	// let cardTo = $("#cardIdTo").val();
+    var cardTo = document.getElementById("cardTo").value;
+	// let tokenTo = $("#erc20To").val();
+    var tokenTo = document.getElementById("tokenTo").value;
+	 let okenTo = await contract.tokenToNft(contractTo, cardTo, tokenTo )
+	okenTo = await okenTo.wait()
+	contract.on("currencyAttached", (minter, cardId, currency)=>{
+		console.log("ERC721 contract is ", minter)	
+		console.log("Your NFT ID is ", cardId)
+		console.log("ERC20 you attached to this NFT is", currency)		
+    })
+	console.log(okenTo)
+  console.log(okenTo.transactionHash)
+  document.getElementById("tokNft").innerHTML =okenTo.transactionHash
 }
-async function balanceJS() {
-  pid = parseInt($("#pid").val());
-
-  console.log(typeof pid)
-   const x=await contract.methods.contractBalance (pid).call();
-   
-    
-    //document.getElementById('showCard').innerHTML = x;
+// cardInfo
+async function cardInfoJS(){
+    var contractADR = document.getElementById("cardfi_contractaddress").value;
+    var tokenid = document.getElementById("cardfi_tokenid").value;
+      // let contractADR = $("#CONTRACT").val();
+      // let  tokenid = $("#TOKEID").val();
+      const cardInfovar = await contract.cardInfo(contractADR, tokenid)
+    var txObject={balance:cardInfovar[0].toString(),
+                 ERC20Added:cardInfovar[2].toString(),
+                ERC20Address:cardInfovar[1].toString()}
+    console.log(txObject);
+bubble_fn_cardfi(JSON.stringify(txObject));
+// load cardInfo if token parameter is in url
+if (window.location.href.indexOf("token") > -1) {
+  var contractADR = window.location.href.split("token=")[1];
+  cardInfoJS(contractADR);
 }
-
-async function infoCard() {
-  cardId = $("#cardId").val();
-   const x=await contract.methods.cardInfo (cardId).call();
-   
-    
-    //document.getElementById('lastInfo').innerHTML = x;
+  }
+// cardInfo2
+async function cardInfoJS2(){
+    var contractADR = document.getElementById("ERC721").value;
+    var tokenid = document.getElementById("idOfCard").value;
+      // let contractADR = $("#CONTRACT").val();
+      // let  tokenid = $("#TOKEID").val();
+      const cardInfovar = await contract.cardInfo(contractADR, tokenid)
+    var txObject={balance:cardInfovar[0].toString(),
+                 ERC20Added:cardInfovar[2].toString(),
+                ERC20Address:cardInfovar[1].toString()}
+    console.log(txObject);
+bubble_fn_sendTokens(JSON.stringify(txObject));
+// load cardInfo if token parameter is in url
+if (window.location.href.indexOf("token") > -1) {
+  var contractADR = window.location.href.split("token=")[1];
+  cardInfoJS(contractADR);
 }
+  }
+// sendTokens
+async function sendTokensJS(){
+	let contractADR = $("#ERC721").val();
+	let  tokenid = $("#idOfCard").val();
+	let  amount = $("#amountOF").val();
+	//let  Delay = $("#delay").val();
+	const cardInfo = await contract.cardInfo(contractADR, tokenid)
+	const ERC20Address = cardInfo.currencyAddress
+	const ERC20_ABI = ["function approve(address pender, uint256 amount) returns (bool)"]
+	const erc20Instance = new ethers.Contract(ERC20Address, ERC20_ABI, signer)
+	await erc20Instance.approve(contractAddress, amount);
+	let tx = await contract.sendTokens(contractADR, tokenid, amount)
+	tx = await tx.wait()
+       // const x = await contract.cardInfo(contractADR, tokenid)
+	 	
+         console.log(tx)
+	
+  document.getElementById("sendTok").innerHTML =bubble_fn_cardfi_sendTokens(tx)
+}
+// contractBalance
+async function contractBalanceJS(){
+	let  erc20 = $("#erc20Balance").val();
+	const balance = await contract.contractBalance(erc20)
+	//console.log("The amount of this ERC20 inside of this contract is", balance.toNumber(), "wei")
+	
+}
+// takeSomeMoney
+async function takeSomeMoneyJS(){
+	let contractSome = $("#contractSome").val();
+	let cardIdSome = $("#cardIdSome").val();
+	let amountSome = $("#moneySome").val();
+	const {v, r,s, message, signerAddress} = await verify()
+	let tx = await contract.takeSomeMoney(contractSome, cardIdSome, amountSome, v, r, s, message, signerAddress)
+	tx = await tx.wait()
+	contract.on("portionTaken", (amountRecived, royalty, remainingFunds)=>{
+		console.log("Recieved", amountRecived.toNumber())	
+			
+		console.log("Remaining balance on your NFT", remainingFunds.toNumber())		
+    })
+    console.log(tx)		
+    document.getElementById("takeMoney").innerHTML =bubble_fn_cardfi_takeSomeMoney(tx)
+}
+</script>
