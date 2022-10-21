@@ -1,0 +1,17 @@
+
+
+1.  0x595a69Ce32A1Cc4DbA7A600CBb090f336E9bE322  - new contract address
+
+2.  abi.js  - is a new abi
+
+3. functions_only.js  - contains only the functions that you can pick without copying the whole page. 
+
+   Each function now gives a responce -an object with the exact data 
+  
+   Each function has a bubble_fn that is commented out.
+
+   Each  bubble_fn function's object is already JSON.Stringified
+
+   But it's better if we deal with the functions when we are live
+
+

@@ -209,3 +209,4 @@ async function takeSomeMoneyJS(){
     document.getElementById("takeMoney").innerHTML =bubble_fn_cardfi_takeSomeMoney(tx)
 }
 </script>
+
